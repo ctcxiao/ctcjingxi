@@ -10,7 +10,7 @@ public interface LogisticsRecordsRepository extends JpaRepository<LogisticsRecor
 
     @Modifying
     @Transactional
-    @Query("update LogisticsRecords set logisticsStatus=?1 where id=?2")
-    void updateLogisticsStatus(String logisticsStatus, int id);
+    @Query("update LogisticsRecords set logisticsStatus=?1, createTime=?2 where id=?3")
+    void updateLogisticsStatus(String logisticsStatus, String time, int id);
 
 }

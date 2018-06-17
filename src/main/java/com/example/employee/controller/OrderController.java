@@ -4,6 +4,7 @@ import com.example.employee.entity.*;
 import com.example.employee.repository.LogisticsRecordsRepository;
 import com.example.employee.repository.OrderRepository;
 
+import com.example.employee.repository.ProduceRepository;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -24,6 +25,9 @@ public class OrderController {
 
     @Autowired
     private LogisticsRecordsRepository logisticsRecordsRepository;
+
+    @Autowired
+    private ProduceRepository produceRepository;
 
     @RequestMapping(value = "/orders", method = RequestMethod.POST)
     public ResponseEntity<List<Orders>> createOrder(@RequestBody String body) {
@@ -48,7 +52,9 @@ public class OrderController {
 
     @RequestMapping(value = "/orders/{id}", method = RequestMethod.PUT)
     public ResponseEntity payForOrder(@PathVariable("id") int id, @RequestParam("orderStatus") String status) {
-        orderRepository.updateOrderStatus(status, id);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        String createTime = simpleDateFormat.format(System.currentTimeMillis());
+        orderRepository.updateOrderStatus(status, createTime, id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
@@ -85,7 +91,14 @@ public class OrderController {
 
     @RequestMapping(value = "/logisticsRecords/{id}/orders/{id}", method = RequestMethod.PUT)
     public ResponseEntity updateLogisticsStatus(@PathVariable("id") int id, @RequestParam("logisticsStatus") String logisticsStatus) {
-        logisticsRecordsRepository.updateLogisticsStatus(logisticsStatus, id);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        String time = simpleDateFormat.format(System.currentTimeMillis());
+        if ("signed".equals(logisticsStatus)){
+            Products products = produceRepository.findById(id).get();
+            int count = products.getCount()-1;
+            produceRepository.updateProductCount(count, id);
+        }
+        logisticsRecordsRepository.updateLogisticsStatus(logisticsStatus, time, id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 

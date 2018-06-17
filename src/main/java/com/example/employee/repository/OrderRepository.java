@@ -13,8 +13,8 @@ public interface OrderRepository extends JpaRepository<Orders, Integer> {
 
     @Modifying
     @Transactional
-    @Query(value = "update orders set status=?1 where id=?2", nativeQuery = true)
-    void updateOrderStatus(String status, int id);
+    @Query(value = "update orders set status=?1, buyTime=?2 where id=?3", nativeQuery = true)
+    void updateOrderStatus(String status, String time, int id);
 
     Orders findById(int id);
 
