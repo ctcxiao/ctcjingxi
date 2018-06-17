@@ -1,6 +1,7 @@
 package com.example.employee.controller;
 
 import com.example.employee.entity.*;
+import com.example.employee.repository.InventoryRepository;
 import com.example.employee.repository.LogisticsRecordsRepository;
 import com.example.employee.repository.OrderRepository;
 
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
@@ -29,38 +31,83 @@ public class OrderController {
     @Autowired
     private ProduceRepository produceRepository;
 
+    @Autowired
+    private InventoryRepository inventoryRepository;
+
     @RequestMapping(value = "/orders", method = RequestMethod.POST)
     public ResponseEntity<List<Orders>> createOrder(@RequestBody String body) {
         List<OrderCreateEntity> orderCreateEntities = new Gson().fromJson(body, new TypeToken<ArrayList<OrderCreateEntity>>() {
         }.getType());
         final List<Orders> ordersList = new ArrayList<>();
+
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         orderCreateEntities.forEach((orderCreateEntity) -> {
             String createTime = simpleDateFormat.format(System.currentTimeMillis());
             Orders orders = new Orders(0, "", orderCreateEntity.getPurchaseCount(),
                     createTime, 30.30, 1, "" + orderCreateEntity.getProductId());
             orderRepository.save(orders);
-            LogisticsRecords logisticsRecords = new LogisticsRecords(orders.getId(), orders.getTotalPrice(),
-                    orders.getUserId(), orders.getBuyTime(), "", orders.getOrderDetail());
-            logisticsRecordsRepository.save(logisticsRecords);
-            ordersList.add(orders);
+
+            int result = lockCount(orderCreateEntity.getProductId(), orderCreateEntity.getPurchaseCount());
+            if (result == 0) {
+                LogisticsRecords logisticsRecords = new LogisticsRecords(orders.getId(), orders.getTotalPrice(),
+                        orders.getUserId(), orders.getBuyTime(), "", orders.getOrderDetail());
+                logisticsRecordsRepository.save(logisticsRecords);
+                ordersList.add(orders);
+            }
         });
+
         HttpHeaders responseHeader = new HttpHeaders();
         responseHeader.add("location", "jingxi");
         return new ResponseEntity<>(ordersList, responseHeader, HttpStatus.CREATED);
+    }
+
+    @Transactional
+    private int lockCount(int productId, int num){
+        Inventory inventory = inventoryRepository.findByProductId(productId);
+        if (inventory == null){
+            System.out.println("the products has no inventory!!");
+            return -1;
+        }
+
+        if (inventory.getLockCount()+num>inventory.getCounts()){
+            System.out.println("inventory is not enough!!");
+            return -2;
+        }
+        inventoryRepository.updateLockCount(inventory.getLockCount()+num, productId);
+        return 0;
+    }
+
+    @Transactional
+    private void unlockCount(int productId, int num){
+        Inventory inventory = inventoryRepository.findByProductId(productId);
+        if (inventory == null){
+            System.out.println("the products has no inventory!!");
+            return;
+        }
+        inventoryRepository.updateLockCount(inventory.getLockCount()-num, productId);
     }
 
     @RequestMapping(value = "/orders/{id}", method = RequestMethod.PUT)
     public ResponseEntity payForOrder(@PathVariable("id") int id, @RequestParam("orderStatus") String status) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         String createTime = simpleDateFormat.format(System.currentTimeMillis());
+        if ("withdrawn".equals(status)){
+            withdrawOrder(id);
+        }
         orderRepository.updateOrderStatus(status, createTime, id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    @Transactional
+    private void withdrawOrder(int orderId) {
+        Orders orders = orderRepository.findById(orderId);
+        unlockCount(Integer.valueOf(orders.getOrderDetail()), orders.getBuyCount());
     }
 
     @RequestMapping(value = "/orders/{id}", method = RequestMethod.GET)
     public ResponseOrders findOrdersById(@PathVariable("id") int id) {
         Orders orders = orderRepository.findById(id);
+
         if (orders == null) {
             throw new RuntimeException("there is no orders");
         }
@@ -94,13 +141,18 @@ public class OrderController {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         String time = simpleDateFormat.format(System.currentTimeMillis());
         if ("signed".equals(logisticsStatus)){
-            Products products = produceRepository.findById(id).get();
-            int count = products.getCount()-1;
-            produceRepository.updateProductCount(count, id);
+            signForLogistics(id);
         }
         logisticsRecordsRepository.updateLogisticsStatus(logisticsStatus, time, id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
+    @Transactional
+    private void signForLogistics(int id) {
+        Orders orders = orderRepository.findById(id);
+        Inventory inventory = inventoryRepository.findByProductId(Integer.valueOf(orders.getOrderDetail()));
+        inventoryRepository.updateCount(inventory.getCounts()-orders.getBuyCount(),Integer.valueOf(orders.getOrderDetail()));
+        inventoryRepository.updateLockCount(inventory.getLockCount()-orders.getBuyCount(), Integer.valueOf(orders.getOrderDetail()));
+    }
 
 }

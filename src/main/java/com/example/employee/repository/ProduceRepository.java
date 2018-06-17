@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 public interface ProduceRepository extends JpaRepository<Products, Integer> {
 
     @Modifying
@@ -23,4 +25,7 @@ public interface ProduceRepository extends JpaRepository<Products, Integer> {
     @Transactional
     @Query(value = "update Products set count=?1 where id=?2", nativeQuery = true)
     void updateProductCount(int count, int id);
+
+
+    List<Products> findAllByName(String name);
 }

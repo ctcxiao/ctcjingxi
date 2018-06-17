@@ -1,8 +1,10 @@
 package com.example.employee.controller;
 
+import com.example.employee.entity.Inventory;
 import com.example.employee.entity.Products;
 import com.example.employee.entity.ResponseProduct;
 import com.example.employee.entity.UpdateProEntity;
+import com.example.employee.repository.InventoryRepository;
 import com.example.employee.repository.ProduceRepository;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -20,23 +23,41 @@ public class ProductController {
     @Autowired
     private ProduceRepository produceRepository;
 
+    @Autowired
+    private InventoryRepository inventoryRepository;
+
     @RequestMapping(value = "/products", method = RequestMethod.POST)
     public ResponseEntity<ResponseProduct> createNewProduct(@RequestBody String body) {
         UpdateProEntity updateEntity = new Gson().fromJson(body, UpdateProEntity.class);
-        Products products = new Products(0, "",updateEntity.getName(), updateEntity.getDescription(), updateEntity.getPrice(), 0);
+        Products products = new Products(0, "", updateEntity.getName(), updateEntity.getDescription(), updateEntity.getPrice());
+
         String purchaseUserId = products.getUserId();
         List<Integer> purchaseItemList = new ArrayList<>();
         for (int i = 0; i < purchaseUserId.length(); i++) {
             purchaseItemList.add(purchaseUserId.charAt(i) - '0');
         }
+
+        saveProducts(products);
+
+        Inventory inventory = createInventory(products);
+        inventoryRepository.save(inventory);
+
         ResponseProduct responseProduct = new ResponseProduct(products.getId(), products.getName(), products.getDescription(),
-                products.getPrice(), products.getCount(), purchaseItemList);
+                products.getPrice(), purchaseItemList, inventory);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add("location", "jingxi");
-        ResponseEntity<ResponseProduct> responseEntity = new ResponseEntity<>(responseProduct,responseHeaders, HttpStatus.CREATED);
-        produceRepository.save(products);
-        return responseEntity;
+        return new ResponseEntity<>(responseProduct, responseHeaders, HttpStatus.CREATED);
+    }
 
+    @Transactional
+    private void saveProducts(Products products) {
+        produceRepository.save(products);
+    }
+
+    @Transactional
+    private Inventory createInventory(Products products) {
+        List<Products> product = produceRepository.findAllByName(products.getName());
+        return new Inventory(0, 100, 0, product.get(product.size()-1).getId());
     }
 
     @RequestMapping(value = "/products", method = RequestMethod.GET)
@@ -52,8 +73,9 @@ public class ProductController {
         for (int i = 0; i < purchaseUserId.length(); i++) {
             purchaseItemList.add(purchaseUserId.charAt(i) - '0');
         }
+        Inventory inventory = inventoryRepository.findByProductId(id);
         return new ResponseProduct(products.getId(), products.getName(), products.getDescription(),
-                products.getPrice(), products.getCount(), purchaseItemList);
+                products.getPrice(), purchaseItemList, inventory);
     }
 
     @RequestMapping(value = "/products/{id}", method = RequestMethod.PUT)
@@ -78,9 +100,9 @@ public class ProductController {
     }
 
     @RequestMapping(value = "/inventories/{id}", method = RequestMethod.PUT)
-    public ResponseEntity updateProductCount(@PathVariable("id")int id, @RequestBody String body){
+    public ResponseEntity updateProductCount(@PathVariable("id") int id, @RequestBody String body) {
         UpdateProEntity updateProEntity = new Gson().fromJson(body, UpdateProEntity.class);
-        produceRepository.updateProductCount(updateProEntity.getCount(), id);
+        inventoryRepository.updateCount(updateProEntity.getCount(), id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
 
     }

@@ -20,7 +20,6 @@ CREATE TABLE Products(
     name VARCHAR(255) NOT NULL,
     description VARCHAR(255),
     price DOUBLE(10,2) NOT NULL,
-    count INT NOT NULL,
     userId VARCHAR(20),
     PRIMARY KEY(id)
 ) engine=InnoDB DEFAULT CHARSET = utf8;
@@ -34,3 +33,11 @@ CREATE TABLE LogisticsRecords(
     purchaseString VARCHAR(255),
     PRIMARY KEY(id)
 ) engine=InnoDB DEFAULT CHARSET = utf8;
+
+CREATE TABLE Inventory(
+    id INT auto_increment,
+    counts INT,
+    lockCount INT,
+    productId INT,
+    PRIMARY KEY(id)
+)

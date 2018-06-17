@@ -8,15 +8,17 @@ public class ResponseProduct {
     private String name;
     private String description;
     private double price;
-    private int count;
-    private List<Integer> inventory;
 
-    public ResponseProduct(int id, String name, String description, double price, int count, List<Integer> inventory) {
+    private List<Integer> purchaseItemList;
+
+    private Inventory inventory;
+
+    public ResponseProduct(int id, String name, String description, double price, List<Integer>purchaseItemList, Inventory inventory) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
-        this.count = count;
+        this.purchaseItemList = purchaseItemList;
         this.inventory = inventory;
     }
 
@@ -52,21 +54,19 @@ public class ResponseProduct {
         this.price = price;
     }
 
-    public int getCount() {
-        return count;
+    public List<Integer> getPurchaseItemList() {
+        return purchaseItemList;
     }
 
-    public void setCount(int count) {
-        this.count = count;
+    public void setPurchaseItemList(List<Integer> purchaseItemList) {
+        this.purchaseItemList = purchaseItemList;
     }
 
-    public List<Integer> getInventory() {
+    public Inventory getInventory() {
         return inventory;
     }
 
-    public void setInventory(List<Integer> inventory) {
+    public void setInventory(Inventory inventory) {
         this.inventory = inventory;
     }
-
-
 }
