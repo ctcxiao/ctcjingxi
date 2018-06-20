@@ -1,8 +1,11 @@
 package com.example.employee.entity;
 
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "Inventory")
@@ -11,13 +14,14 @@ public class Inventory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private int counts;
+    @Column(name = "counts")
+    private int count;
     private int lockCount;
     private int productId;
 
-    public Inventory(int id, int counts, int lockCount, int productId) {
+    public Inventory(int id, int count, int lockCount, int productId) {
         this.id = id;
-        this.counts = counts;
+        this.count = count;
         this.lockCount = lockCount;
         this.productId = productId;
     }
@@ -25,12 +29,16 @@ public class Inventory {
     public Inventory() {
     }
 
-    public int getCounts() {
-        return counts;
+    public int getId() {
+        return id;
     }
 
-    public void setCounts(int counts) {
-        this.counts = counts;
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 
     public int getLockCount() {

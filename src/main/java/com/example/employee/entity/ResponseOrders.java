@@ -1,15 +1,15 @@
 package com.example.employee.entity;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 public class ResponseOrders {
     private int id;
     private double totalPrice;
     private int userId;
-    private String createTime;
-    private List<Integer> purchaseItemList;
+    private LocalDateTime createTime;
+    private String purchaseItemList;
 
-    public ResponseOrders(int id, double totalPrice, int userId, String createTime, List<Integer> purchaseItemList) {
+    public ResponseOrders(int id, double totalPrice, int userId, LocalDateTime createTime, String purchaseItemList) {
         this.id = id;
         this.totalPrice = totalPrice;
         this.userId = userId;
@@ -41,19 +41,19 @@ public class ResponseOrders {
         this.userId = userId;
     }
 
-    public String getCreateTime() {
+    public LocalDateTime getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(String createTime) {
+    public void setCreateTime(LocalDateTime createTime) {
         this.createTime = createTime;
     }
 
-    public List<Integer> getPurchaseItemList() {
+    public String getPurchaseItemList() {
         return purchaseItemList;
     }
 
-    public void setPurchaseItemList(List<Integer> purchaseItemList) {
+    public void setPurchaseItemList(String purchaseItemList) {
         this.purchaseItemList = purchaseItemList;
     }
 }

@@ -1,17 +1,46 @@
 package com.example.employee.entity;
 
-public class UpdateEntity {
+import javax.persistence.*;
+import java.io.Serializable;
+
+@Entity
+@Table(name = "Products")
+public class Product implements Serializable{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
     private String name;
     private String description;
     private double price;
 
-    public UpdateEntity(String name, String description, double price) {
+    private String userId;
+
+    public Product(String userId, String name, String description, double price) {
+        this.userId = userId;
         this.name = name;
         this.description = description;
         this.price = price;
+
     }
 
-    public UpdateEntity() {
+    public Product() {
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -37,4 +66,6 @@ public class UpdateEntity {
     public void setPrice(double price) {
         this.price = price;
     }
+
+
 }

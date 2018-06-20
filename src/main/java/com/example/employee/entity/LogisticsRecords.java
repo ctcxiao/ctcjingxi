@@ -1,6 +1,7 @@
 package com.example.employee.entity;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "LogisticsRecords")
@@ -12,11 +13,11 @@ public class LogisticsRecords {
 
     private double totalPrice;
     private int userId;
-    private String createTime;
+    private LocalDateTime createTime;
     private String logisticsStatus;
     private String purchaseString;
 
-    public LogisticsRecords(int id, double totalPrice, int userId, String createTime, String logisticsStatus, String purchaseString) {
+    public LogisticsRecords(int id, double totalPrice, int userId, LocalDateTime createTime, String logisticsStatus, String purchaseString) {
         this.id = id;
         this.totalPrice = totalPrice;
         this.userId = userId;
@@ -52,11 +53,11 @@ public class LogisticsRecords {
         this.userId = userId;
     }
 
-    public String getCreateTime() {
+    public LocalDateTime getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(String createTime) {
+    public void setCreateTime(LocalDateTime createTime) {
         this.createTime = createTime;
     }
 
