@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 public class LogisticsRecordController {
@@ -28,13 +26,9 @@ public class LogisticsRecordController {
     @GetMapping(value = "/logisticsRecords/{id}")
     public ResponseLogistics findLogistRecords(@PathVariable("id") int id) {
         LogisticsRecords logisticsRecords = logisticsRecordsRepository.findById(id).get();
-        String purchaseString = logisticsRecords.getPurchaseString();
-        List<Integer> purchaseItemList = new ArrayList<>();
-        for (int i = 0; i < purchaseString.length(); i++) {
-            purchaseItemList.add(purchaseString.charAt(i) - '0');
-        }
+
         return new ResponseLogistics(logisticsRecords.getId(), logisticsRecords.getTotalPrice(), logisticsRecords.getUserId(), logisticsRecords.getCreateTime(),
-            logisticsRecords.getLogisticsStatus(), purchaseItemList);
+            logisticsRecords.getLogisticsStatus(), logisticsRecords.getPurchaseString());
     }
 
     @PutMapping(value = "/logisticsRecords/{id}/orders/{id}")

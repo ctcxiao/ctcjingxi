@@ -64,7 +64,7 @@ public class OrderService {
             return -1;
         }
 
-        if (inventory.getLockCount() + num > inventory.getCounts()) {
+        if (inventory.getLockCount() + num > inventory.getCount()) {
             System.out.println("inventory is not enough!!");
             return -2;
         }
@@ -93,7 +93,7 @@ public class OrderService {
     public void signForLogistics(int id) {
         Order order = orderRepository.findById(id);
         Inventory inventory = inventoryRepository.findByProductId(Integer.valueOf(order.getOrderDetail()));
-        inventoryRepository.updateCount(inventory.getCounts() - order.getBuyCount(), Integer.valueOf(order.getOrderDetail()));
+        inventoryRepository.updateCount(inventory.getCount() - order.getBuyCount(), Integer.valueOf(order.getOrderDetail()));
         inventoryRepository.updateLockCount(inventory.getLockCount() - order.getBuyCount(), Integer.valueOf(order.getOrderDetail()));
     }
 }

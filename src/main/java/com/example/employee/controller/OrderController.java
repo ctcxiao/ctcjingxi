@@ -14,12 +14,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/orders")
 public class OrderController {
     @Autowired
     private OrderRepository orderRepository;
@@ -27,7 +29,7 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @PostMapping(value = "/orders")
+    @PostMapping()
     public ResponseEntity<List<Order>> createOrder(@RequestBody List<OrderCreateEntity> orderCreateEntities) {
         final List<Order> orderList = orderService.createOrders(orderCreateEntities);
 
@@ -36,13 +38,13 @@ public class OrderController {
         return new ResponseEntity<>(orderList, responseHeader, HttpStatus.CREATED);
     }
 
-    @PutMapping(value = "/orders/{id}")
+    @PutMapping(value = "/{id}")
     public ResponseEntity payForOrder(@PathVariable("id") int id, @RequestParam("orderStatus") String status) {
         orderService.updateOrderStatus(id, status);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping(value = "/orders/{id}")
+    @GetMapping(value = "/{id}")
     public ResponseOrders findOrdersById(@PathVariable("id") int id) {
         Order order = orderRepository.findById(id);
 
@@ -52,7 +54,7 @@ public class OrderController {
         return new ResponseOrders(order.getId(), order.getTotalPrice(), order.getUserId(), order.getBuyTime(), order.getOrderDetail());
     }
 
-    @GetMapping(value = "/orders")
+    @GetMapping()
     public List<Order> findOrdersBuUserId(@RequestParam("userId") int id) {
         return orderRepository.findAllByUserId(id);
     }

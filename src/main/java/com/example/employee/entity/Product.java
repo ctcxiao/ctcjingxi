@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "Products")
-public class Products implements Serializable{
+public class Product implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -16,8 +16,7 @@ public class Products implements Serializable{
 
     private String userId;
 
-    public Products(int id, String userId, String name, String description, double price) {
-        this.id = id;
+    public Product(String userId, String name, String description, double price) {
         this.userId = userId;
         this.name = name;
         this.description = description;
@@ -25,7 +24,7 @@ public class Products implements Serializable{
 
     }
 
-    public Products() {
+    public Product() {
     }
 
     public String getUserId() {
