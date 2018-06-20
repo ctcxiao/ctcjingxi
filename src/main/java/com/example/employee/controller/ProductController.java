@@ -6,14 +6,17 @@ import com.example.employee.entity.ResponseProduct;
 import com.example.employee.entity.UpdateProEntity;
 import com.example.employee.repository.InventoryRepository;
 import com.example.employee.repository.ProduceRepository;
-import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +30,7 @@ public class ProductController {
     private InventoryRepository inventoryRepository;
 
     @RequestMapping(value = "/products", method = RequestMethod.POST)
-    public ResponseEntity<ResponseProduct> createNewProduct(@RequestBody String body) {
-        UpdateProEntity updateEntity = new Gson().fromJson(body, UpdateProEntity.class);
+    public ResponseEntity<ResponseProduct> createNewProduct(@RequestBody UpdateProEntity updateEntity) {
         Products products = new Products(0, "", updateEntity.getName(), updateEntity.getDescription(), updateEntity.getPrice());
 
         String purchaseUserId = products.getUserId();
@@ -50,12 +52,12 @@ public class ProductController {
     }
 
     @Transactional
-    private void saveProducts(Products products) {
+    void saveProducts(Products products) {
         produceRepository.save(products);
     }
 
     @Transactional
-    private Inventory createInventory(Products products) {
+    Inventory createInventory(Products products) {
         List<Products> product = produceRepository.findAllByName(products.getName());
         return new Inventory(0, 100, 0, product.get(product.size()-1).getId());
     }
@@ -79,8 +81,7 @@ public class ProductController {
     }
 
     @RequestMapping(value = "/products/{id}", method = RequestMethod.PUT)
-    public ResponseEntity updateProduct(@PathVariable("id") int id, @RequestBody String body) {
-        UpdateProEntity updateEntity = new Gson().fromJson(body, UpdateProEntity.class);
+    public ResponseEntity updateProduct(@PathVariable("id") int id, @RequestBody UpdateProEntity updateEntity) {
         produceRepository.updateProduct(updateEntity.getName(), updateEntity.getDescription(), updateEntity.getPrice(), id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
@@ -100,8 +101,7 @@ public class ProductController {
     }
 
     @RequestMapping(value = "/inventories/{id}", method = RequestMethod.PUT)
-    public ResponseEntity updateProductCount(@PathVariable("id") int id, @RequestBody String body) {
-        UpdateProEntity updateProEntity = new Gson().fromJson(body, UpdateProEntity.class);
+    public ResponseEntity updateProductCount(@PathVariable("id") int id, @RequestBody UpdateProEntity updateProEntity) {
         inventoryRepository.updateCount(updateProEntity.getCount(), id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
 

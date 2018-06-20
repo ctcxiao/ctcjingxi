@@ -1,20 +1,25 @@
 package com.example.employee.controller;
 
-import com.example.employee.entity.*;
+import com.example.employee.entity.Inventory;
+import com.example.employee.entity.LogisticsRecords;
+import com.example.employee.entity.OrderCreateEntity;
+import com.example.employee.entity.Orders;
+import com.example.employee.entity.ResponseLogistics;
+import com.example.employee.entity.ResponseOrders;
 import com.example.employee.repository.InventoryRepository;
 import com.example.employee.repository.LogisticsRecordsRepository;
 import com.example.employee.repository.OrderRepository;
-
-import com.example.employee.repository.ProduceRepository;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,15 +34,10 @@ public class OrderController {
     private LogisticsRecordsRepository logisticsRecordsRepository;
 
     @Autowired
-    private ProduceRepository produceRepository;
-
-    @Autowired
     private InventoryRepository inventoryRepository;
 
     @RequestMapping(value = "/orders", method = RequestMethod.POST)
-    public ResponseEntity<List<Orders>> createOrder(@RequestBody String body) {
-        List<OrderCreateEntity> orderCreateEntities = new Gson().fromJson(body, new TypeToken<ArrayList<OrderCreateEntity>>() {
-        }.getType());
+    public ResponseEntity<List<Orders>> createOrder(@RequestBody List<OrderCreateEntity> orderCreateEntities) {
         final List<Orders> ordersList = new ArrayList<>();
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -62,7 +62,7 @@ public class OrderController {
     }
 
     @Transactional
-    private int lockCount(int productId, int num){
+    int lockCount(int productId, int num){
         Inventory inventory = inventoryRepository.findByProductId(productId);
         if (inventory == null){
             System.out.println("the products has no inventory!!");
@@ -78,7 +78,7 @@ public class OrderController {
     }
 
     @Transactional
-    private void unlockCount(int productId, int num){
+    void unlockCount(int productId, int num){
         Inventory inventory = inventoryRepository.findByProductId(productId);
         if (inventory == null){
             System.out.println("the products has no inventory!!");
@@ -99,7 +99,7 @@ public class OrderController {
     }
 
     @Transactional
-    private void withdrawOrder(int orderId) {
+    void withdrawOrder(int orderId) {
         Orders orders = orderRepository.findById(orderId);
         unlockCount(Integer.valueOf(orders.getOrderDetail()), orders.getBuyCount());
     }
@@ -148,7 +148,7 @@ public class OrderController {
     }
 
     @Transactional
-    private void signForLogistics(int id) {
+    void signForLogistics(int id) {
         Orders orders = orderRepository.findById(id);
         Inventory inventory = inventoryRepository.findByProductId(Integer.valueOf(orders.getOrderDetail()));
         inventoryRepository.updateCount(inventory.getCounts()-orders.getBuyCount(),Integer.valueOf(orders.getOrderDetail()));

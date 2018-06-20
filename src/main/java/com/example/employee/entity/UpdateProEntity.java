@@ -13,15 +13,15 @@ public class UpdateProEntity {
         this.price = price;
     }
 
+    public UpdateProEntity() {
+    }
+
     public int getCount() {
         return count;
     }
 
     public void setCount(int count) {
         this.count = count;
-    }
-
-    public UpdateProEntity() {
     }
 
     public String getName() {
