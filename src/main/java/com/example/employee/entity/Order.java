@@ -1,11 +1,15 @@
 package com.example.employee.entity;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Orders")
-public class Orders {
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,12 +19,12 @@ public class Orders {
     private String status;
 
     private int buyCount;
-    private String buyTime;
+    private LocalDateTime buyTime;
     private double totalPrice;
     private String orderDetail;
 
 
-    public Orders(int id, String status, int buyCount, String buyTime, double totalPrice, int userId, String orderDetail) {
+    public Order(int id, String status, int buyCount, LocalDateTime buyTime, double totalPrice, int userId, String orderDetail) {
         this.id = id;
         this.status = status;
         this.buyCount = buyCount;
@@ -38,7 +42,7 @@ public class Orders {
         this.orderDetail = orderDetail;
     }
 
-    public Orders() {
+    public Order() {
     }
 
     public int getUserId() {
@@ -74,11 +78,11 @@ public class Orders {
         this.buyCount = buyCount;
     }
 
-    public String getBuyTime() {
+    public LocalDateTime getBuyTime() {
         return buyTime;
     }
 
-    public void setBuyTime(String buyTime) {
+    public void setBuyTime(LocalDateTime buyTime) {
         this.buyTime = buyTime;
     }
 

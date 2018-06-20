@@ -28,7 +28,7 @@ CREATE TABLE LogisticsRecords(
     id INT auto_increment,
     totalPrice DOUBLE(20,2) NOT NULL,
     userId INT,
-    createTime VARCHAR(20) NOT NULL,
+    createTime VARCHAR(255) NOT NULL,
     logisticsStatus VARCHAR(255),
     purchaseString VARCHAR(255),
     PRIMARY KEY(id)

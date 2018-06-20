@@ -12,7 +12,7 @@ public class Users {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "userId")
-    private List<Orders> orders;
+    private List<Order> orders;
 
     private String name;
 
@@ -40,11 +40,11 @@ public class Users {
         this.id = id;
     }
 
-    public List<Orders> getOrders() {
+    public List<Order> getOrders() {
         return orders;
     }
 
-    public void setOrders(List<Orders> orders) {
+    public void setOrders(List<Order> orders) {
         this.orders = orders;
     }
 }

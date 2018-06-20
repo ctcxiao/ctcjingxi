@@ -4,11 +4,6 @@ public class OrderCreateEntity {
     private int productId;
     private int purchaseCount;
 
-    public OrderCreateEntity(int productId, int purchaseCount) {
-        this.productId = productId;
-        this.purchaseCount = purchaseCount;
-    }
-
     public OrderCreateEntity() {
     }
 

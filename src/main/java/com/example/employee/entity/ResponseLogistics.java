@@ -1,5 +1,6 @@
 package com.example.employee.entity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ResponseLogistics {
@@ -8,11 +9,11 @@ public class ResponseLogistics {
 
     private double totalPrice;
     private int userId;
-    private String createTime;
+    private LocalDateTime createTime;
     private String logisticsStatus;
     private List<Integer> purchaseItemList;
 
-    public ResponseLogistics(int id, double totalPrice, int userId, String createTime, String logisticsStatus, List<Integer> purchaseItemList) {
+    public ResponseLogistics(int id, double totalPrice, int userId, LocalDateTime createTime, String logisticsStatus, List<Integer> purchaseItemList) {
         this.id = id;
         this.totalPrice = totalPrice;
         this.userId = userId;
@@ -45,11 +46,11 @@ public class ResponseLogistics {
         this.userId = userId;
     }
 
-    public String getCreateTime() {
+    public LocalDateTime getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(String createTime) {
+    public void setCreateTime(LocalDateTime createTime) {
         this.createTime = createTime;
     }
 
